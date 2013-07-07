@@ -28,48 +28,56 @@ import org.json.JSONObject;
 import self.philbrown.droidMail.MailConfiguration.Provider;
 import self.philbrown.droidQuery.$;
 import self.philbrown.droidQuery.Function;
-import android.content.Context;
 import android.util.Log;
 
 /**
- * Useful Object for droidQuery
+ * Used to configure a droidMail email account.
  * @author Phil Brown
  *
  */
 public class MailOptions 
 {
+	/** <em>this</em> MailConfiguration */
 	public MailConfiguration configuration;
+	/** Email Password */
 	private String password;
-	public Function success, error, complete;
+	/** Callback for a successfully sent message */
+	public Function success;
+	/** Callback for a message that could not be sent */
+	public Function error;
+	/** Callback for after the message has been sent (either successfully or not) */
+	public Function complete;
+	/** Email Subject */
 	public String subject = null;
+	/** Email Message content */
 	public String message = null;
+	/** Email attachment */
 	public String attachment = null;
+	/** Email destination addresses */
 	public String[] destinations = null;
 
 	/**
+	 * Constructor.<br>
 	 * Use JSON string to create:
 	 * <pre>
-	 * new MailOptions($.this, "{
-	 *                    email: "john.doe@gmail.com",
-	 *                    username: "john.doe",
-	 *                    password: "idkmypsswd",
-	 *                    provider: "gmail", //note: must be one of the available providers
-	 *                    destinations: [ "jane.doe@yahoo.com", "bill.doe@yahoo.com" ],
-	 *                    subject: "I love you",
-	 *                    message: "Have a great day at work!",
-	 *                    attachment: "path/to/file.txt"
+	 * new MailOptions("{
+	 *                    email: 'john.doe@gmail.com',
+	 *                    username: 'john.doe',
+	 *                    password: 'idkmypsswd',
+	 *                    provider: 'gmail', //note: must be one of the available providers
+	 *                    destinations: [ 'jane.doe@yahoo.com', 'bill.doe@yahoo.com' ],
+	 *                    subject: 'I love you',
+	 *                    message: 'Have a great day at work!',
+	 *                    attachment: 'path/to/file.txt'
 	 *                  }").success(new Function() {
-	 *                  	@Override
 	 *                  	public void invoke(Object... args) {
-	 *                  		$.alert("message sent!");
+	 *                  		$.alert(this, "message sent!");
 	 *                  	}
 	 *                  }).error(new Function() {
-	 *                  	@Override
 	 *                  	public void invoke(Object... args) {
-	 *                  		$.alert("message failed!");
+	 *                  		$.alert(this, "message failed!");
 	 *                  	}
 	 *                  }).complete(new Function() {
-	 *                  	@Override
 	 *                  	public void invoke(Object... args) {
 	 *                  		Log.i("Mail", "Message complete");
 	 *                  	}
@@ -88,7 +96,7 @@ public class MailOptions
 	 * 	<li> <b>message:</b> string message of the email
 	 * 	<li> <b>attachment:</b> path to attachment file
 	 * </ul>
-	 * @param json
+	 * @param json the JSON string
 	 * @throws JSONException if JSON string is malformed
 	 */
 	public MailOptions(String json) throws JSONException
@@ -96,6 +104,24 @@ public class MailOptions
 		this($.map(new JSONObject(json)));
 	}
 	
+	/**
+	 * Constructor. Use Key-Value pairings for configuration.<br>
+	 * 
+	 * <h1>JSON Options</h1>
+	 * <ul>
+	 * 	<li> <b>email:</b> string representation sender's email address
+	 * 	<li> <b>username:</b> string representation of the sender's username
+	 * 	<li> <b>password:</b> string representation of the sender's password
+	 * 	<li> <b>provider:</b> string representation of a {@link MailConfiguration.Provider}
+	 * 	<li> <b>destination:</b> a single string representation of the destination address
+	 * 	<li> <b>destinations:</b> use instead of {@code destination} to represent, in array form, a list of
+	 * destination addresses. For example: [ "jane.doe@yahoo.com", "foobar@example.com" ]
+	 * 	<li> <b>subject:</b> string subject of the email
+	 * 	<li> <b>message:</b> string message of the email
+	 * 	<li> <b>attachment:</b> path to attachment file
+	 * </ul>
+	 * @param json the dictionary of Options
+	 */
 	public MailOptions(Map<String, Object> json)
 	{
 		String email = null;
@@ -175,26 +201,47 @@ public class MailOptions
 		}
 	}
 	
+	/**
+	 * Set the function to call when the message has been sent (whether or not is was successful 
+	 * or failed)
+	 * @param complete the Function
+	 * @return this
+	 */
 	public MailOptions complete(Function complete)
 	{
 		this.complete = complete;
 		return this;
 	}
 	
+	/**
+	 * Set the function to call when the message has been sent successfully
+	 * @param success the Function
+	 * @return this
+	 */
 	public MailOptions success(Function success)
 	{
 		this.success = success;
 		return this;
 	}
 	
+	/**
+	 * Set the function to call when the message has failed to send
+	 * @param error the Function
+	 * @return this
+	 */
 	public MailOptions error(Function error)
 	{
 		this.error = error;
 		return this;
 	}
 	
-	public Mailer getMailer(Context context)
+	/**
+	 * Gets the mailer required to send the message. This is placed here to avoid passing around the
+	 * password argument (which is now kept secure).
+	 * @return
+	 */
+	public Mailer getMailer()
 	{
-		return new Mailer(context, configuration, password);
+		return new Mailer(configuration, password);
 	}
 }

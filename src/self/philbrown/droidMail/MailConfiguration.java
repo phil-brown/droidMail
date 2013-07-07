@@ -25,7 +25,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -390,12 +389,11 @@ public class MailConfiguration implements Parcelable
 	 * password field properly by not keeping a reference to it anywhere else. It is kept private in 
 	 * this Configuration, cannot be unparceled by an outside class, is encrypted in the store, and
 	 * is private in Mailer.
-	 * @param context needed to create the Mailer
 	 * @return a new Mailer Object using this configuration
 	 */
-	public Mailer createMailer(Context context)
+	public Mailer createMailer()
 	{
-		return new Mailer(context, this, password);
+		return new Mailer(this, password);
 	}
 	
 }

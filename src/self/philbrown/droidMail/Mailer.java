@@ -39,7 +39,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -78,18 +77,14 @@ public class Mailer extends javax.mail.Authenticator
 	/**
 	 * Constructor: Creates a new {@code Mailer} with the given configuration. The password must be the same password used when constructing
 	 * the {@link MailConfiguration}. To avoid hardcoding the password, or passing it around as a public or protected variable, 
-	 * use {@code MailConfiguration.createMailer(Context)} or {@code MailConfigStore.createMailer(Context, String)}.
-	 * @param context used to access the store
+	 * use {@code MailOptions.getMailer()} or {@code MailConfigStore.createMailer(String)}.
 	 * @param config the configuration that provides the source account information
 	 * @param password the password associated with {@code config}
-	 * @see MailConfiguration#createMailer(Context)
-	 * @see MailConfigStore#createMailer(Context, String)
+	 * @see MailConfiguration#createMailer()
+	 * @see MailOptions#getMailer()
 	 */
-	public Mailer(Context context, MailConfiguration config, String password)
+	public Mailer(MailConfiguration config, String password)
 	{
-		if (context == null)
-			throw new NullPointerException("Cannot create new Mailer with null context!");
-		
 		if (config == null)
 			throw new NullPointerException("Cannot create new Mailer with null configuration!");
 		

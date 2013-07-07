@@ -23,36 +23,35 @@ import org.json.JSONException;
 import self.philbrown.droidMail.Mailer.MailListener;
 import self.philbrown.droidQuery.$;
 import self.philbrown.droidQuery.$Extension;
-import self.philbrown.droidQuery.Function;
-import android.content.Context;
 
 /**
- * Mail Extension for droidQuery. Enables ability to send mail without user input. For example,
- * the following will send an email from john.doe@gmail.com to jane.doe@yahoo.com:
+ * Mail Extension for <a href="https://github.com/phil-brown/droidQuery">droidQuery</a>.<br>
+ * Adds the ability to send email messages without <em>Intent</em>, and minimal (if any) user input. 
+ * For example, the following will send an email from <em>john.doe@gmail.com</em> to 
+ * <em>jane.doe@yahoo.com</em>:
  * <pre>
  * $.extend("mail", "self.philbrown.droidMail.$Mail");
- * $.with(this).ext("mail", new MailOptions("{ email: "john.doe@gmail.com",
- *                                             username: "john.doe",
- *                                             password: "idkmypsswd",
- *                                             provider: "gmail",
- *                                             destination: "jane.doe@yahoo.com",
- *                                             subject: "I love you",
- *                                             message: "Have a great day at work!",
- *                                             attachment: "path/to/file.txt"
+ * $.with(this).ext("mail", new MailOptions("{ email: 'john.doe@gmail.com',
+ *                                             username: 'john.doe',
+ *                                             password: 'idkmypsswd',
+ *                                             provider: 'gmail',
+ *                                             destination: 'jane.doe@yahoo.com',
+ *                                             subject: 'I love you',
+ *                                             message: 'Have a great day at work!',
+ *                                             attachment: 'path/to/file.txt'
  *                                            }"));
  * </pre>
- * Alternatively, one can create the $Mail instance, and use it later to send messages:
+ * Alternatively, one can create the {@code $Mail} instance, and use it later to send messages:
  * <pre>
  * $.extend("mail", "self.philbrown.droidMail.$Mail");
- * $Mail mail = ($Mail) $.with(this).ext("mail", new MailOptions("{ email: "john.doe@gmail.com",
- *                                                                  username: "john.doe",
- *                                                                  password: "idkmypsswd",
- *                                                                  provider: "gmail"
- *                                                                 }"));
- * mail.send("{ destination: "jane.doe@yahoo.com",
- *              subject: "I love you",
- *              message: "Have a great day at work!",
- *              attachment: "path/to/file.txt"
+ * $Mail mail = ($Mail) $.with(this).ext("mail", new MailOptions("{ email: 'john.doe@gmail.com',
+ *                                                                  username: 'john.doe',
+ *                                                                  password: 'idkmypsswd',
+ *                                                                  provider: 'gmail' }"));
+ * mail.send("{ destination: 'jane.doe@yahoo.com',
+ *              subject: 'I love you',
+ *              message: 'Have a great day at work!',
+ *              attachment: 'path/to/file.txt'
  *            }");
  * </pre>
  * @author Phil Brown
@@ -60,7 +59,7 @@ import android.content.Context;
  */
 public class $Mail extends $Extension
 {
-	private $ droidQuery;
+	/** Mail Configuration Options */
 	private MailOptions options;
 
 	/**
@@ -69,7 +68,6 @@ public class $Mail extends $Extension
 	 */
 	public $Mail($ droidQuery) {
 		super(droidQuery);
-		this.droidQuery = droidQuery;
 	}
 
 	@Override
@@ -79,37 +77,31 @@ public class $Mail extends $Extension
 			options = (MailOptions) args[0];
 			if (options.destinations != null && options.message != null)
 			{
-				droidQuery.manage(new Function() {
+				Mailer mailer = options.getMailer();
+				mailer.setMailListener(new MailListener() {
+
 					@Override
-					public void invoke(Object... args) {
-						Context context = (Context) args[0];
-						Mailer mailer = options.getMailer(context);
-						mailer.setMailListener(new MailListener() {
-
-							@Override
-							public void onSuccess(Mailer m) {
-								options.success.invoke();
-							}
-
-							@Override
-							public void onError(Mailer m) {
-								options.error.invoke();
-							}
-
-							@Override
-							public void onComplete(Mailer m) {
-								options.error.invoke();
-							}
-							
-						});
-						File attachment = null;
-						if (options.attachment != null)
-						{
-							attachment = new File(options.attachment);
-						}
-						mailer.send(options.destinations, options.subject, options.message, attachment);
+					public void onSuccess(Mailer m) {
+						options.success.invoke();
 					}
+
+					@Override
+					public void onError(Mailer m) {
+						options.error.invoke();
+					}
+
+					@Override
+					public void onComplete(Mailer m) {
+						options.error.invoke();
+					}
+					
 				});
+				File attachment = null;
+				if (options.attachment != null)
+				{
+					attachment = new File(options.attachment);
+				}
+				mailer.send(options.destinations, options.subject, options.message, attachment);
 			}
 			
 		}
@@ -148,32 +140,26 @@ public class $Mail extends $Extension
 	 */
 	public void send(final String[] destinations, final String subject, final String message, final File attachment)
 	{
-		droidQuery.manage(new Function() {
+		Mailer mailer = options.getMailer();
+		mailer.setMailListener(new MailListener() {
+
 			@Override
-			public void invoke(Object... args) {
-				Context context = (Context) args[0];
-				Mailer mailer = options.getMailer(context);
-				mailer.setMailListener(new MailListener() {
-
-					@Override
-					public void onSuccess(Mailer m) {
-						options.success.invoke();
-					}
-
-					@Override
-					public void onError(Mailer m) {
-						options.error.invoke();
-					}
-
-					@Override
-					public void onComplete(Mailer m) {
-						options.error.invoke();
-					}
-					
-				});
-				mailer.send(destinations, subject, message, attachment);
+			public void onSuccess(Mailer m) {
+				options.success.invoke();
 			}
+
+			@Override
+			public void onError(Mailer m) {
+				options.error.invoke();
+			}
+
+			@Override
+			public void onComplete(Mailer m) {
+				options.error.invoke();
+			}
+			
 		});
+		mailer.send(destinations, subject, message, attachment);
 	}
 
 }
