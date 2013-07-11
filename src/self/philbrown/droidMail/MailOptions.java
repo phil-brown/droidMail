@@ -112,7 +112,8 @@ public class MailOptions
 	 * 	<li> <b>email:</b> string representation sender's email address
 	 * 	<li> <b>username:</b> string representation of the sender's username
 	 * 	<li> <b>password:</b> string representation of the sender's password
-	 * 	<li> <b>provider:</b> string representation of a {@link MailConfiguration.Provider}
+	 * 	<li> <b>provider:</b> string representation of a {@link MailConfiguration.Provider} <b>OR</b>
+	 * an instance of {@link MailConfiguration}. This is useful for custom configurations.
 	 * 	<li> <b>destination:</b> a single string representation of the destination address
 	 * 	<li> <b>destinations:</b> use instead of {@code destination} to represent, in array form, a list of
 	 * destination addresses. For example: [ "jane.doe@yahoo.com", "foobar@example.com" ]
@@ -126,7 +127,7 @@ public class MailOptions
 	{
 		String email = null;
 		String username = null;
-		Provider provider = null;
+		Object provider = null;
 		
 		
 		for (Entry<String, Object> entry : json.entrySet())
@@ -147,8 +148,10 @@ public class MailOptions
 			}
 			else if (key.equalsIgnoreCase("provider"))
 			{
-				provider = Provider.valueOf(Provider.class, ((String) value).toLowerCase(Locale.US));
-					
+				if (value instanceof String)
+					provider = Provider.valueOf(Provider.class, ((String) value).toLowerCase(Locale.US));
+				else if (value instanceof MailConfiguration)
+					provider = value;
 			}
 			else if (key.equalsIgnoreCase("destination"))
 			{
@@ -194,7 +197,10 @@ public class MailOptions
 			}
 			
 			try {
-				this.configuration = new MailConfiguration(email, username, password, provider);
+				if (provider instanceof Provider)
+					this.configuration = new MailConfiguration(email, username, password, (Provider) provider);
+				else if (provider instanceof MailConfiguration)
+					this.configuration = new MailConfiguration(email, username, password, (MailConfiguration) provider);
 			} catch (InvalidKeyException e) {
 				Log.e("$Mail", "Invalid Provider");
 			}
