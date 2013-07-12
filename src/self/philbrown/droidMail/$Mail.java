@@ -61,6 +61,9 @@ public class $Mail extends $Extension
 {
 	/** Mail Configuration Options */
 	private MailOptions options;
+	
+	/** The droidQuery passed to callbacks */
+	private $ droidQuery;
 
 	/**
 	 * Constructor
@@ -68,6 +71,7 @@ public class $Mail extends $Extension
 	 */
 	public $Mail($ droidQuery) {
 		super(droidQuery);
+		this.droidQuery = droidQuery;
 	}
 
 	@Override
@@ -82,17 +86,17 @@ public class $Mail extends $Extension
 
 					@Override
 					public void onSuccess(Mailer m) {
-						options.success.invoke();
+						options.success.invoke(droidQuery);
 					}
 
 					@Override
 					public void onError(Mailer m) {
-						options.error.invoke();
+						options.error.invoke(droidQuery);
 					}
 
 					@Override
 					public void onComplete(Mailer m) {
-						options.error.invoke();
+						options.error.invoke(droidQuery);
 					}
 					
 				});
@@ -145,17 +149,17 @@ public class $Mail extends $Extension
 
 			@Override
 			public void onSuccess(Mailer m) {
-				options.success.invoke();
+				options.success.invoke(droidQuery);
 			}
 
 			@Override
 			public void onError(Mailer m) {
-				options.error.invoke();
+				options.error.invoke(droidQuery);
 			}
 
 			@Override
 			public void onComplete(Mailer m) {
-				options.error.invoke();
+				options.error.invoke(droidQuery);
 			}
 			
 		});
