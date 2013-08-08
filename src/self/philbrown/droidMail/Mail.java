@@ -57,7 +57,7 @@ import self.philbrown.droidQuery.$Extension;
  * @author Phil Brown
  *
  */
-public class $Mail extends $Extension
+public class Mail extends $Extension
 {
 	/** Mail Configuration Options */
 	private MailOptions options;
@@ -69,7 +69,7 @@ public class $Mail extends $Extension
 	 * Constructor
 	 * @param droidQuery
 	 */
-	public $Mail($ droidQuery) {
+	public Mail($ droidQuery) {
 		super(droidQuery);
 		this.droidQuery = droidQuery;
 	}
