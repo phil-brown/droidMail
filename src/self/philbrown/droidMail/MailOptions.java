@@ -123,14 +123,14 @@ public class MailOptions
 	 * </ul>
 	 * @param json the dictionary of Options
 	 */
-	public MailOptions(Map<String, Object> json)
+	public MailOptions(Map<String, ?> json)
 	{
 		String email = null;
 		String username = null;
 		Object provider = null;
 		
 		
-		for (Entry<String, Object> entry : json.entrySet())
+		for (Entry<String, ?> entry : json.entrySet())
 		{
 			String key = entry.getKey();
 			Object value = entry.getValue();
